@@ -229,31 +229,30 @@ $cityRows = $wpdb->get_row( "SELECT * FROM aramex_master where pincode=$theorder
 			'Shipments' => array(
 				'Shipment' => array(
 						'Shipper'	=> array(
-										'Reference1' 	=> 'glam'.$_POST['oid'],
+										'Reference1' 	=> 'xxxxxxx',
 										'Reference2' 	=> '',
-										'AccountNumber' => '50613983',
+										'AccountNumber' => 'xxxxxxxx',
 										'PartyAddress'	=> array(
-											'Line1'					=> 'Room no-103, B-9, First Floor, Housing
-Socity, South Extension Part-I',
+											'Line1'					=> 'xxxxxxxxx',
 											'Line2' 				=> '',
 											'Line3' 				=> '',
-											'City'					=> 'New Delhi South Ext-II',
+											'City'					=> 'xxxxxxxxx',
 											'StateOrProvinceCode'	=> '',
-											'PostCode'				=> 110049,
+											'PostCode'				=> 'xxxxxx',
 											'CountryCode'			=> 'IN'
 										),
 										'Contact'		=> array(
 											'Department'			=> '',
-											'PersonName'			=> 'Gautam',
+											'PersonName'			=> 'xxxxxxx',
 											'Title'					=> '',
-											'CompanyName'			=> 'getglamr',
-											'PhoneNumber1'			=> '5555555',
-											'PhoneNumber1Ext'		=> '125',
+											'CompanyName'			=> 'xxxxxxx',
+											'PhoneNumber1'			=> 'xxxxxxx',
+											'PhoneNumber1Ext'		=> 'xxxxxx',
 											'PhoneNumber2'			=> '',
 											'PhoneNumber2Ext'		=> '',
 											'FaxNumber'				=> '',
-											'CellPhone'				=> '07777777',
-											'EmailAddress'			=> 'michael@aramex.com',
+											'CellPhone'				=> 'xxxxxx',
+											'EmailAddress'			=> 'xxxxxxxxx',
 											'Type'					=> ''
 										),
 						),
@@ -262,8 +261,8 @@ Socity, South Extension Part-I',
                                     // $theorder->shipping_state
                           
 						'Consignee'	=> array(
-										'Reference1'	=> 'Ref 333333',
-										'Reference2'	=> 'Ref 444444',
+										'Reference1'	=> 'xxxxxx',
+										'Reference2'	=> '',
 										'AccountNumber' => '',
 										'PartyAddress'	=> array(
 											'Line1'					=> $theorder->shipping_address_1,
@@ -352,7 +351,7 @@ Socity, South Extension Part-I',
 										),
 						),
 						
-						'Reference1' 				=> 'glam'.$_POST['oid'],
+						'Reference1' 				=> 'xxxxxx',
 						'Reference2' 				=> '',
 						'Reference3' 				=> '',
 						'ForeignHAWB'				=> '',
@@ -385,7 +384,7 @@ Socity, South Extension Part-I',
 										'PaymentOptions' 		=> '',
 										'Services'			=> $paymentService,
 										'NumberOfPieces'		=> 1,
-										'DescriptionOfGoods' 	=> 'Shoes',
+										'DescriptionOfGoods' 	=> 'xxxxxx',
 										'GoodsOriginCountry' 	=> 'IN',
 										
 										'CashOnDeliveryAmount' 	=> array(
@@ -410,11 +409,11 @@ Socity, South Extension Part-I',
 		
 			'ClientInfo'  			=> array(
 										'AccountCountryCode'	=> 'IN',
-										'AccountEntity'		 	=> 'DEL',
-										'AccountNumber'		 	=> '50613983',
-										'AccountPin'		 	=> '654654',
-										'UserName'			 	=> 'gautamkhurana@getglamr.com',
-										'Password'			 	=> '@getglamr',
+										'AccountEntity'		 	=> 'xxxxx',
+										'AccountNumber'		 	=> 'xxxxx',
+										'AccountPin'		 	=> 'xxxxx',
+										'UserName'			 	=> 'xxxxxx',
+										'Password'			 	=> 'xxxxxxx',
 										'Version'			 	=> 'v1.0'
 									),
 
@@ -438,7 +437,7 @@ Socity, South Extension Part-I',
 				'Value'		=> 0.5,
 				'Unit'		=> 'Kg',		
 		),
-		'Comments'		=> 'Shoes',
+		'Comments'		=> 'xxxxxx',
 		'Reference'		=> ''
 	);
 	
