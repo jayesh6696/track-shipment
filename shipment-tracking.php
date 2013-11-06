@@ -25,7 +25,7 @@ if ( ! function_exists( 'woothemes_queue_update' ) )
  */
 //woothemes_queue_update( plugin_basename( __FILE__ ), '1968e199038a8a001c9f9966fd06bf88', '18693' );
 
-if ((!( is_woocommerce_active()) )) {
+if ((( is_woocommerce_active()) )) {
 
 	/**
 	 * WC_Shipment_Tracking class
@@ -117,6 +117,8 @@ ericSiteIdent=',
 							=> 'self',
                                             'blue dart'
 							=> 'http://www.bluedart.com/maintracking.html',
+                                            'fedex'
+							=> 'http://www.bluedart.com/maintracking.html',
 					),
 				);
 
@@ -132,6 +134,7 @@ ericSiteIdent=',
                                 add_action( 'woocommerce_view_order',  array( &$this,'my_bluedart_javascript' ));
                                 add_action('wp_ajax_my_action', array(&$this, 'my_action_callback'));
                                 add_action('wp_ajax_bluedart_action', array(&$this, 'bluedart_bluedarts_callback'));
+                                add_action('wp_ajax_fedex_action', array(&$this, 'fedex_fedexs_callback'));
                                
                                // add_action('wp_ajax_my_action', 'my_action_callback');
 			}
@@ -158,6 +161,256 @@ ericSiteIdent=',
                             </script>';
                         }
                       */ 
+          
+ function fedex_fedexs_callback(){
+     	global $woocommerce, $post,$wpdb;
+            
+		//$order = new WC_Order(get_the_ID());
+	//error_reporting(E_ALL);
+	//ini_set('display_errors', '1');
+	//echo $post->ID;
+
+	//if ( empty( $the_order ) || $the_order->id != $post->ID )
+	$theorder = new WC_Order( $_POST['oid'] );
+       // echo '<pre>';
+       // print_r($theorder); 
+        $enableSpecialShipment =  false;
+                if($theorder->payment_method == 'cod'){
+                    $enableSpecialShipment =  true;
+                     $totalAmt = $theorder->order_total;
+        } else {
+            $enableSpecialShipment =  false;
+            $totalAmt = $theorder->order_total;
+        }
+        
+        
+      //  exit;
+     $xmlData1 ='<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://fedex.com/ws/ship/v13">
+<SOAP-ENV:Body>
+<ns1:ProcessShipmentRequest>
+
+<ns1:WebAuthenticationDetail>
+  <ns1:UserCredential>
+    <ns1:Key>rMxKQsk586ogz1VX</ns1:Key>
+    <ns1:Password>IyHDZ2i5lnYSzldsuOSyzTFK7</ns1:Password>
+  </ns1:UserCredential>
+</ns1:WebAuthenticationDetail>
+
+<ns1:ClientDetail>
+  <ns1:AccountNumber>510087844</ns1:AccountNumber>
+  <ns1:MeterNumber>118588783</ns1:MeterNumber>
+</ns1:ClientDetail>
+
+<ns1:TransactionDetail>
+  <ns1:CustomerTransactionId>*** Intra India Shipping Request v13.***</ns1:CustomerTransactionId>
+</ns1:TransactionDetail>
+
+<ns1:Version>
+  <ns1:ServiceId>ship</ns1:ServiceId>
+  <ns1:Major>13</ns1:Major>
+  <ns1:Intermediate>0</ns1:Intermediate>
+<ns1:Minor>0</ns1:Minor>
+</ns1:Version>
+
+<ns1:RequestedShipment>
+  <ns1:ShipTimestamp>'.$_POST['selecteddate'].'T05:47:54+00:00</ns1:ShipTimestamp>
+  <ns1:DropoffType>REGULAR_PICKUP</ns1:DropoffType>
+  <ns1:ServiceType>STANDARD_OVERNIGHT</ns1:ServiceType>
+  <ns1:PackagingType>YOUR_PACKAGING</ns1:PackagingType>
+  <ns1:Shipper>
+      <ns1:Contact>
+      <ns1:PersonName>Sender Name</ns1:PersonName>
+      <ns1:CompanyName>Sender Company Name</ns1:CompanyName>
+      <ns1:PhoneNumber>1234567890</ns1:PhoneNumber>
+      </ns1:Contact>
+      <ns1:Address>
+        <ns1:StreetLines>1 SENDER STREET</ns1:StreetLines>
+        <ns1:City>PUNE</ns1:City>
+        <ns1:StateOrProvinceCode>MH</ns1:StateOrProvinceCode>
+        <ns1:PostalCode>411011</ns1:PostalCode>
+        <ns1:CountryCode>IN</ns1:CountryCode>
+        <ns1:CountryName>INDIA</ns1:CountryName>
+      </ns1:Address>
+  </ns1:Shipper>
+<ns1:Recipient>
+<ns1:Contact>
+<ns1:PersonName>'.$theorder->shipping_first_name.'</ns1:PersonName>
+<ns1:CompanyName>'.$theorder->shipping_company.'</ns1:CompanyName>
+<ns1:PhoneNumber>'.$theorder->billing_phone.'</ns1:PhoneNumber>
+</ns1:Contact>
+<ns1:Address>
+<ns1:StreetLines>'.$theorder->shipping_address_1.'</ns1:StreetLines>
+<ns1:City>'.$theorder->shipping_city.'</ns1:City>
+<ns1:StateOrProvinceCode>'.$theorder->shipping_state.'</ns1:StateOrProvinceCode>
+<ns1:PostalCode>'.$theorder->shipping_postcode.'</ns1:PostalCode>
+<ns1:CountryCode>IN</ns1:CountryCode>
+<ns1:CountryName>INDIA</ns1:CountryName>
+<ns1:Residential>false</ns1:Residential>
+</ns1:Address>
+</ns1:Recipient>
+<ns1:ShippingChargesPayment>
+<ns1:PaymentType>SENDER</ns1:PaymentType>
+<ns1:Payor>
+<ns1:ResponsibleParty>
+<ns1:AccountNumber>510087844</ns1:AccountNumber>
+<ns1:Contact/>
+<ns1:Address>
+<ns1:CountryCode>IN</ns1:CountryCode>
+</ns1:Address>
+</ns1:ResponsibleParty>
+</ns1:Payor>
+</ns1:ShippingChargesPayment>';
+
+if($enableSpecialShipment){
+$xmlData2 = '<ns1:SpecialServicesRequested>
+<ns1:SpecialServiceTypes>COD</ns1:SpecialServiceTypes>
+<ns1:CodDetail>
+<ns1:CodCollectionAmount>
+<ns1:Currency>INR</ns1:Currency>
+<ns1:Amount>'.$totalAmt.'</ns1:Amount>
+</ns1:CodCollectionAmount>
+<ns1:CollectionType>GUARANTEED_FUNDS</ns1:CollectionType>
+<ns1:FinancialInstitutionContactAndAddress>
+<ns1:Contact>
+<ns1:PersonName>'.$theorder->shipping_first_name.'</ns1:PersonName>
+<ns1:CompanyName>'.$theorder->shipping_company.'</ns1:CompanyName>
+<ns1:PhoneNumber>'.$theorder->billing_phone.'</ns1:PhoneNumber>
+</ns1:Contact>
+<ns1:Address>
+<ns1:StreetLines>'.$theorder->shipping_address_1.'</ns1:StreetLines>
+<ns1:City>'.$theorder->shipping_city.'</ns1:City>
+<ns1:StateOrProvinceCode>'.$theorder->shipping_state.'</ns1:StateOrProvinceCode>
+<ns1:PostalCode>'.$theorder->shipping_postcode.'</ns1:PostalCode>
+<ns1:CountryCode>IN</ns1:CountryCode>
+<ns1:CountryName>INDIA</ns1:CountryName>
+</ns1:Address>
+</ns1:FinancialInstitutionContactAndAddress>
+<ns1:RemitToName>Remitter</ns1:RemitToName>
+</ns1:CodDetail>
+</ns1:SpecialServicesRequested>';
+} else {$xmlData2 ='';}
+
+
+$xmlData3 = '
+<ns1:CustomsClearanceDetail>
+<ns1:DutiesPayment>
+<ns1:PaymentType>SENDER</ns1:PaymentType>
+<ns1:Payor>
+<ns1:ResponsibleParty>
+<ns1:AccountNumber>510087844</ns1:AccountNumber>
+<ns1:Contact/>
+<ns1:Address>
+<ns1:CountryCode>IN</ns1:CountryCode>
+</ns1:Address>
+</ns1:ResponsibleParty>
+</ns1:Payor>
+</ns1:DutiesPayment>
+<ns1:DocumentContent>NON_DOCUMENTS</ns1:DocumentContent>
+<ns1:CustomsValue>
+<ns1:Currency>INR</ns1:Currency>
+<ns1:Amount>'.$totalAmt.'</ns1:Amount>
+</ns1:CustomsValue>
+<ns1:CommercialInvoice>
+<ns1:Purpose>SOLD</ns1:Purpose>
+<ns1:CustomerReferences>
+<ns1:CustomerReferenceType>CUSTOMER_REFERENCE</ns1:CustomerReferenceType>
+<ns1:Value>1234</ns1:Value>
+</ns1:CustomerReferences>
+</ns1:CommercialInvoice>
+<ns1:Commodities>
+<ns1:NumberOfPieces>1</ns1:NumberOfPieces>
+<ns1:Description>Books</ns1:Description>
+<ns1:CountryOfManufacture>IN</ns1:CountryOfManufacture>
+<ns1:Weight>
+<ns1:Units>LB</ns1:Units>
+<ns1:Value>1</ns1:Value>
+</ns1:Weight>
+<ns1:Quantity>4</ns1:Quantity>
+<ns1:QuantityUnits>EA</ns1:QuantityUnits>
+<ns1:UnitPrice>
+<ns1:Currency>INR</ns1:Currency>
+<ns1:Amount>100</ns1:Amount>
+</ns1:UnitPrice>
+<ns1:CustomsValue>
+<ns1:Currency>INR</ns1:Currency>
+<ns1:Amount>100</ns1:Amount>
+</ns1:CustomsValue>
+</ns1:Commodities>
+</ns1:CustomsClearanceDetail>
+<ns1:LabelSpecification>
+<ns1:LabelFormatType>COMMON2D</ns1:LabelFormatType>
+<ns1:ImageType>PDF</ns1:ImageType>
+<ns1:LabelStockType>PAPER_7X4.75</ns1:LabelStockType>
+</ns1:LabelSpecification>
+<ns1:RateRequestTypes>ACCOUNT</ns1:RateRequestTypes>
+<ns1:PackageCount>1</ns1:PackageCount>
+<ns1:RequestedPackageLineItems>
+<ns1:SequenceNumber>1</ns1:SequenceNumber>
+<ns1:GroupPackageCount>1</ns1:GroupPackageCount>
+<ns1:InsuredValue>
+<ns1:Currency>INR</ns1:Currency>
+<ns1:Amount>0</ns1:Amount>
+</ns1:InsuredValue>
+<ns1:Weight>
+<ns1:Units>LB</ns1:Units>
+<ns1:Value>20</ns1:Value>
+</ns1:Weight>
+<ns1:Dimensions>
+<ns1:Length>20</ns1:Length>
+<ns1:Width>10</ns1:Width>
+<ns1:Height>10</ns1:Height>
+<ns1:Units>IN</ns1:Units>
+</ns1:Dimensions>
+<ns1:CustomerReferences>
+<ns1:CustomerReferenceType>CUSTOMER_REFERENCE</ns1:CustomerReferenceType>
+<ns1:Value>GR4567892</ns1:Value>
+</ns1:CustomerReferences>
+</ns1:RequestedPackageLineItems>
+</ns1:RequestedShipment>
+</ns1:ProcessShipmentRequest>
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>';
+
+$xmlData = $xmlData1.$xmlData2.$xmlData3;
+
+$URL = 'https://wsbeta.fedex.com:443/web-services';
+
+      $ch = curl_init($URL);
+      curl_setopt($ch, CURLOPT_MUTE, 1);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+      curl_setopt($ch, CURLOPT_POST, 1);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $xmlData);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+       $output = curl_exec($ch);
+      curl_close($ch);
+       $xml = simplexml_load_string($output);   
+   //    $xml->registerXPathNamespace('env', 'http://schemas.xmlsoap.org/soap/envelope/');
+//$xml->registerXPathNamespace('v4', 'http://fedex.com/ws/track/v4');
+//var_dump($xml->xpath('env:Body/v4:TrackReply'));
+       $xml->registerXPathNamespace('soapenv', 'http://schemas.xmlsoap.org/soap/envelope/');
+      $xml->registerXPathNamespace('env', 'http://schemas.xmlsoap.org/soap/envelope/');  
+     //  $xml->registerXPathNamespace('xsi', 'http://www.w3.org/2001/XMLSchema-instance');  
+       $xml->registerXPathNamespace('v13', 'http://fedex.com/ws/ship/v13');  
+     //  $xml->registerXPathNamespace('SOAP-ENV', 'http://schemas.xmlsoap.org/soap/envelope/');  
+     //  $xml->registerXPathNamespace('ns1', 'http://fedex.com/ws/ship/v13');     
+    //   var_dump($xml->xpath('soapenv:Body'));          
+
+       $bodies = $xml->xpath('soapenv:Body');
+foreach($bodies as $body){
+    $reply = $body->children('v13', TRUE)->ProcessShipmentReply;
+  //  var_dump($reply);
+     //   echo '<pre>';
+        //    print_r($reply);  
+
+         echo   $reply->CompletedShipmentDetail->CompletedPackageDetails->TrackingIds->TrackingNumber;
+}
+           //   echo '<pre>';
+          //    print_r($xml->xpath('soapenv:Body'));          
+                        
+           exit;       
+ }                       
                         
 function bluedart_bluedarts_callback() {
 	global $woocommerce, $post,$wpdb;
@@ -622,7 +875,24 @@ $cityRows = $wpdb->get_row( "SELECT * FROM aramex_master where pincode=$theorder
                             });  
 
 
-                                        }}
+                                        }
+                                        else if(provider=='fedex'){
+                                         jQuery('#loadimg').show();
+                                                                            var data = {
+                                    action: 'fedex_action',
+                                    whatever: 1234,
+                                    oid:".$post->ID.",
+                                    selecteddate:".dateSelected."    
+                            };
+
+                                           jQuery.post(ajaxurl, data, function(response) {
+                                          jQuery('#tracking_number').val(response);
+                                         //  alert(response);
+                            });  
+
+
+                                          }
+                                            }
                                                     
 						var postcode = jQuery('#_shipping_postcode').val();
 
